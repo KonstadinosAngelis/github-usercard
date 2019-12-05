@@ -2,7 +2,6 @@
            (replacing the palceholder with your Github name):
            https://api.github.com/users/<your name>
 */
-
 /* Step 2: Inspect and study the data coming back, this is YOUR 
    github info! You will need to understand the structure of this 
    data in order to use it to build your component function 
@@ -53,3 +52,75 @@ const followersArray = [];
   luishrd
   bigknell
 */
+
+function gitHubBuilder(object) {
+  const cardContainer = document.createElement('div');
+  const profilePicture = document.createElement('img');
+  const cardInfo = document.createElement('div');
+  const realName = document.createElement('h3');
+  const handleName = document.createElement('p');
+  const location = document.createElement('p');
+  const profileLink = document.createElement('p');
+  const linkToGithub = document.createElement('a');
+  const followers = document.createElement('p');
+  const following = document.createElement('p');
+  const bio = document.createElement('p');
+
+  profilePicture.src  = object.avatar_url;
+  realName.textContent = object.name;
+  handleName.textContent = object.login;
+  location.textContent = object.location;
+  linkToGithub.href = object.html_url;
+  followers.textContent = object.followers;
+  following.textContent = object.following;
+  bio.textContent = object.bio;
+
+  cardContainer.classList.add('card');
+  cardInfo.classList.add('card-info');
+  realName.classList.add('name');
+  handleName.classList.add('username')
+
+  cardContainer.appendChild(profilePicture);
+  cardContainer.appendChild(cardInfo);
+  cardInfo.appendChild(realName);
+  cardInfo.appendChild(handleName);
+  cardInfo.appendChild(location);
+  cardInfo.appendChild(profileLink);
+  profileLink.appendChild(linkToGithub);
+  cardInfo.appendChild(followers);
+  cardInfo.appendChild(following);
+  cardInfo.appendChild(bio);
+
+  console.log(cardContainer);
+  // const entryPoint = document.querySelector('.cards');
+  // entryPoint.appendChild(cardContainer)
+  return cardContainer
+}
+
+const entryPoint = document.querySelector('.cards');
+
+axios.get("https://api.github.com/users/KonstadinosAngelis")
+.then(response => {
+    entryPoint.appendChild(gitHubBuilder(response.data));
+
+    axios.get(response.data.followers_url)
+    .then(response =>{
+      console.log(response.data);
+      response.data.forEach(element => {
+
+        axios.get(element.url)
+        .then(response =>{
+          entryPoint.appendChild(gitHubBuilder(response.data));
+        })
+        .catch( error => {
+          console.log("Error:", error);
+        })
+      })
+    })
+    .catch( error => {
+      console.log("Error:", error);
+    })
+  })
+.catch( error => {
+  console.log("Error:", error);
+})
